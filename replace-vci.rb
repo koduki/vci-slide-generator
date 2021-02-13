@@ -1,7 +1,7 @@
 require 'json'
 
 template_vci_path = ARGV[0] #'WhiteBoard.vci'
-image_path = ARGV[1]  #'testdata.png'
+image_path = ARGV[1]  #'001.png'
 output_path = ARGV[2] #'output.vci'
 info = {title:ARGV[3], version:ARGV[4], author:ARGV[5], description:ARGV[6]}
 page_size = ARGV[7].to_f
@@ -37,13 +37,14 @@ vci_meta["author"] = info[:author]
 vci_meta["description"] = info[:description]
 
 # Adjust for page size
-material = property["materials"].find{|x| x["name"] == "WB_Material"}
-#material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
+material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
+material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
 # Create Data
 image = open(image_path, 'rb').read
 
 diff = (4 - (image.size % 3)) # zero padding
+# diff = 0
 data = image + FF * diff
 target_idx = 0
 property["bufferViews"].each_with_index do |x, i|
@@ -52,7 +53,7 @@ property["bufferViews"].each_with_index do |x, i|
 end
 
 # Create JSON
-property["images"][0]["name"]="slide"
+property["images"][0]["name"]="MySlide"
 property["bufferViews"][0]["byteLength"] = image.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
@@ -62,12 +63,44 @@ xs = property["bufferViews"]
     xs[i]["byteOffset"] = offset
 end
 property["buffers"][0]["byteLength"] = data.size
-json = property.to_json.gsub('/', '\/') + "   "
+json = property.to_json.gsub('/', '\/')
+
+# Padding
+p "image-size: #{image.size}"
+p "json-size: #{json.size}"
+# diff = 4 - (json.size % 4)
+# diff += 1 if data.size % 2 == 0 # なぜ必要かが分からないけどこれで補正すると動く 
+# diff2 = 1#(json.size + data.size) % 4 
+# p "diff2=#{diff2}"
+# diff = (4 - (json.size % 4)) + diff2
+
+paddingValue = json.size % 4
+padding = (paddingValue > 0) ? 4 - paddingValue : 0;
+padding += 3
+p "padding: #{padding}"
+json = json + (" " * padding) # space padding for 4 byte boundary
+p json.size
+
+p "data-size: #{data.size}"
+# diff = 4 - (data.size % 4)
+paddingValue = data.size % 4
+padding = (paddingValue > 0) ? 4 - paddingValue : 0;
+padding += 0
+p "padding: #{padding}"
+data = data + (FF * padding) # zero padding for 4 byte boundary
+p data.size
+
+p "(json) % 2 == #{(data.size) % 2}"
+p "(json) % 3 == #{(data.size) % 3}"
+p "(json) % 4 == #{(data.size) % 4}"
+p "(json + data) % 2 == #{(json.size + data.size) % 2}"
+p "(json + data) % 3 == #{(json.size + data.size) % 3}"
+p "(json + data) % 4 == #{(json.size + data.size) % 4}"
 
 # Store GLTF
 glb = GLB_H_MAGIC
 glb += GLB_H_VERSION
-glb += [json.size + data.size + (GLB_H_SIZE * 3) + (GLB_H_SIZE * 2) + (GLB_H_SIZE * 2)].pack("L*")
+glb += [(GLB_H_SIZE * 3) + (GLB_H_SIZE * 2) + json.size + (GLB_H_SIZE * 2) + data.size].pack("L*")
 
 glb += [json.size].pack("L*")
 glb += GLB_JSON_TYPE
