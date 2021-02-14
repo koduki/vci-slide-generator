@@ -78,13 +78,15 @@ def padding_size(data_size)
     end
 end
 
+img_padding_size = padding_size(image.size)
+src_padding_size = padding_size(src.size)
 data = ""
 property["bufferViews"].each_with_index do |x, i|
     case i
     when img_idx
-        data += image + FF * padding_size(image.size)
+        data += image + FF * img_padding_size
     when src_idx
-        data += src + FF * padding_size(src.size)
+        data += src + FF * src_padding_size
     else
         data += glb_buff_data[x["byteOffset"], x["byteLength"]]
     end
@@ -106,14 +108,14 @@ material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
 material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
 # buffers/Update bufferViews
-property["bufferViews"][src_idx]["byteLength"] = src.size
 property["bufferViews"][img_idx]["byteLength"] = image.size
+property["bufferViews"][src_idx]["byteLength"] = src.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
     offset = px["byteOffset"] + px["byteLength"]
-    offset += padding_size(src.size) if i==(src_idx + 1)
-    offset += padding_size(image.size) if i==(img_idx + 1)
+    offset += img_padding_size if i==(img_idx + 1)
+    offset += src_padding_size if i==(src_idx + 1)
     xs[i]["byteOffset"] = offset
 end
 
