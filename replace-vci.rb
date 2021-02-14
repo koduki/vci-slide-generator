@@ -106,12 +106,14 @@ material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
 material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
 # buffers/Update bufferViews
-property["bufferViews"][src_idx]["byteLength"] = src.size + padding_size(src.size)
-property["bufferViews"][img_idx]["byteLength"] = image.size + padding_size(image.size)
+property["bufferViews"][src_idx]["byteLength"] = src.size
+property["bufferViews"][img_idx]["byteLength"] = image.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
     offset = px["byteOffset"] + px["byteLength"]
+    offset += padding_size(src.size) if i==(src_idx + 1)
+    offset += padding_size(image.size) if i==(img_idx + 1)
     xs[i]["byteOffset"] = offset
 end
 
@@ -122,7 +124,7 @@ json = property.to_json.gsub('/', '\/')
 p "json-size: #{json.size}"
 json_padding = padding_size(json.size)
 
-json = json + (" " * json_padding) 
+json = json + (" " * json_padding)
 p "padding: #{json_padding}, json-size: #{json.size}"
 
 p "image-size: #{image.size}"
