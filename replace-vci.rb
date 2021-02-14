@@ -68,14 +68,23 @@ src_idx = property["extensions"]["VCAST_vci_embedded_script"]["scripts"][0]["sou
 #
 # Create Data
 #
-diff = 4 - (image.size % 3) # zero padding
+
+def padding_size(data_size)
+    if data_size == 0 then
+        return 0
+    else
+        m = data_size % 4
+        return m > 0 ? 4 - m : 0
+    end
+end
+
 data = ""
 property["bufferViews"].each_with_index do |x, i|
     case i
     when img_idx
-        data += image + FF * diff
+        data += image + FF * padding_size(image.size)
     when src_idx
-        data += src
+        data += src + FF * padding_size(src.size)
     else
         data += glb_buff_data[x["byteOffset"], x["byteLength"]]
     end
@@ -97,13 +106,12 @@ material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
 material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
 # buffers/Update bufferViews
-property["bufferViews"][src_idx]["byteLength"] = src.size
-property["bufferViews"][img_idx]["byteLength"] = image.size
+property["bufferViews"][src_idx]["byteLength"] = src.size + padding_size(src.size)
+property["bufferViews"][img_idx]["byteLength"] = image.size + padding_size(image.size)
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
     offset = px["byteOffset"] + px["byteLength"]
-    offset += diff if i==(img_idx + 1)
     xs[i]["byteOffset"] = offset
 end
 
@@ -112,23 +120,16 @@ json = property.to_json.gsub('/', '\/')
 
 # Padding　for 4 byte boundary
 p "json-size: #{json.size}"
-paddingValue = json.size % 4
-padding = (paddingValue > 0) ? 4 - paddingValue : 0;
-diff = 3
-padding += diff # 謎の微調整
+json_padding = padding_size(json.size)
 
-json = json + (" " * padding) 
-p "padding: #{padding}, diff: #{diff} ,json-size: #{json.size}"
-
+json = json + (" " * json_padding) 
+p "padding: #{json_padding}, json-size: #{json.size}"
 
 p "image-size: #{image.size}"
 p "data-size: #{data.size}"
-paddingValue = data.size % 4
-padding = (paddingValue > 0) ? 4 - paddingValue : 0;
-diff = 0
-padding += diff
-data = data + (FF * padding)
-p "padding: #{padding}, diff: #{diff} ,data-size: #{data.size}"
+data_padding = padding_size(data.size)
+data = data + (FF * data_padding)
+p "padding: #{data_padding}, data-size: #{data.size}"
 
 
 # p "(json) % 2 == #{(data.size) % 2}"
