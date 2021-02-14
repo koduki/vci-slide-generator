@@ -40,15 +40,52 @@ vci_meta["description"] = info[:description]
 material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
 material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
+#
 # Create Data
+#
+
+# load image
+img_idx = 0
 image = open(image_path, 'rb').read
+
+# Lua Script
+src = <<"EOS"
+GrabCount = 0
+UseCount = 0
+MAX_SLIDE_PAGE = #{page_size.to_i}
+
+function onGrab(target)
+    GrabCount = GrabCount + 1
+    print("Grab : "..GrabCount)
+    print(target)
+end
+
+function onUse(use)
+    UseCount = UseCount + 1
+    print("onUse : "..use..UseCount)
+
+    local index = UseCount % MAX_SLIDE_PAGE
+    local offset = Vector2.zero
+    offset.y = 0
+    offset.x = (1.0 / MAX_SLIDE_PAGE) * index
+    vci.assets._ALL_SetMaterialTextureOffsetFromName("ScreenTexture", offset)
+    print("page: "..(index + 1))
+end
+EOS
+
+src_idx = property["extensions"]["VCAST_vci_embedded_script"]["scripts"][0]["source"]
+property["bufferViews"][src_idx]["byteLength"] = src.size
+
 
 diff = (4 - (image.size % 3)) # zero padding
 # diff = 0
 data = image + FF * diff
-target_idx = 0
 property["bufferViews"].each_with_index do |x, i|
-    next if i==target_idx
+    next if i==img_idx
+    if i == src_idx
+        data += src
+        next
+    end
     data += glb_buff_data[x["byteOffset"], x["byteLength"]]
 end
 
@@ -59,7 +96,7 @@ xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
     offset = px["byteOffset"] + px["byteLength"]
-    offset += diff if i==(target_idx + 1)
+    offset += diff if i==(img_idx + 1)
     xs[i]["byteOffset"] = offset
 end
 property["buffers"][0]["byteLength"] = data.size
