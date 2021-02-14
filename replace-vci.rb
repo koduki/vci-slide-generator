@@ -2,9 +2,9 @@ require 'json'
 
 template_vci_path = ARGV[0] #'WhiteBoard.vci'
 image_path = ARGV[1]  #'001.png'
-output_path = ARGV[2] #'output.vci'
-info = {title:ARGV[3], version:ARGV[4], author:ARGV[5], description:ARGV[6]}
-page_size = ARGV[7].to_f
+page_size = ARGV[2].to_f
+output_path = ARGV[3] #'dist/output.vci'
+info = {title:ARGV[4], version:ARGV[5], author:ARGV[6], description:ARGV[7]}
 
 GLB_H_SIZE = 4
 GLB_H_MAGIC = "glTF".b
@@ -13,7 +13,9 @@ GLB_JSON_TYPE = "JSON".b
 GLB_BUFF_TYPE = "BIN\x00".b
 FF = "\x00".b
 
+#
 # Load Template
+#
 io = open(template_vci_path)
 glb_h_magic = io.read(GLB_H_SIZE)
 glb_h_version = io.read(GLB_H_SIZE).unpack("L*")[0]
@@ -29,23 +31,12 @@ glb_buff_data = io.read(glb_buff_length)
 
 property = JSON.parse(glb_json_data)
 
-# Update meta
-vci_meta = property["extensions"]["VCAST_vci_meta"]
-vci_meta["title"] = info[:title]
-vci_meta["version"] = info[:version]
-vci_meta["author"] = info[:author]
-vci_meta["description"] = info[:description]
-
-# Adjust for page size
-material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
-material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
-
 #
-# Create Data
+# Prepare resources
 #
 
 # load image
-img_idx = 0
+img_idx = property["images"].find{|x| x["name"] == "template" }["bufferView"]
 image = open(image_path, 'rb').read
 
 # Lua Script
@@ -76,21 +67,38 @@ EOS
 src_idx = property["extensions"]["VCAST_vci_embedded_script"]["scripts"][0]["source"]
 property["bufferViews"][src_idx]["byteLength"] = src.size
 
-
+#
+# Create Data
+#
 diff = (4 - (image.size % 3)) # zero padding
-# diff = 0
-data = image + FF * diff
+data = ""
 property["bufferViews"].each_with_index do |x, i|
-    next if i==img_idx
-    if i == src_idx
+    case i
+    when img_idx
+        data += image + FF * diff
+    when src_idx
         data += src
-        next
+    else
+        data += glb_buff_data[x["byteOffset"], x["byteLength"]]
     end
-    data += glb_buff_data[x["byteOffset"], x["byteLength"]]
 end
 
+#
 # Create JSON
-property["images"][0]["name"]="MySlide"
+#
+
+# Update meta data
+vci_meta = property["extensions"]["VCAST_vci_meta"]
+vci_meta["title"] = info[:title]
+vci_meta["version"] = info[:version]
+vci_meta["author"] = info[:author]
+vci_meta["description"] = info[:description]
+
+# Adjust for page size
+material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
+material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
+
+# Update bufferViews
 property["bufferViews"][0]["byteLength"] = image.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
@@ -102,39 +110,39 @@ end
 property["buffers"][0]["byteLength"] = data.size
 json = property.to_json.gsub('/', '\/')
 
-# Padding
-p "image-size: #{image.size}"
+# Padding　for 4 byte boundary
 p "json-size: #{json.size}"
-# diff = 4 - (json.size % 4)
-# diff += 1 if data.size % 2 == 0 # なぜ必要かが分からないけどこれで補正すると動く 
-# diff2 = 1#(json.size + data.size) % 4 
-# p "diff2=#{diff2}"
-# diff = (4 - (json.size % 4)) + diff2
-
 paddingValue = json.size % 4
 padding = (paddingValue > 0) ? 4 - paddingValue : 0;
-padding += 3
-p "padding: #{padding}"
-json = json + (" " * padding) # space padding for 4 byte boundary
-p json.size
+diff = 3
+padding += diff # 謎の微調整
 
+json = json + (" " * padding) 
+p "padding: #{padding}, diff: #{diff} ,json-size: #{json.size}"
+
+
+p "image-size: #{image.size}"
 p "data-size: #{data.size}"
-# diff = 4 - (data.size % 4)
 paddingValue = data.size % 4
 padding = (paddingValue > 0) ? 4 - paddingValue : 0;
-padding += 0
-p "padding: #{padding}"
-data = data + (FF * padding) # zero padding for 4 byte boundary
-p data.size
+diff = 0
+padding += diff
+data = data + (FF * padding)
+p "padding: #{padding}, diff: #{diff} ,data-size: #{data.size}"
 
-p "(json) % 2 == #{(data.size) % 2}"
-p "(json) % 3 == #{(data.size) % 3}"
-p "(json) % 4 == #{(data.size) % 4}"
-p "(json + data) % 2 == #{(json.size + data.size) % 2}"
-p "(json + data) % 3 == #{(json.size + data.size) % 3}"
-p "(json + data) % 4 == #{(json.size + data.size) % 4}"
 
-# Store GLTF
+# p "(json) % 2 == #{(data.size) % 2}"
+# p "(json) % 3 == #{(data.size) % 3}"
+# p "(json) % 4 == #{(data.size) % 4}"
+# p "(json + data) % 2 == #{(json.size + data.size) % 2}"
+# p "(json + data) % 3 == #{(json.size + data.size) % 3}"
+# p "(json + data) % 4 == #{(json.size + data.size) % 4}"
+
+
+
+#
+# Store as GLB
+#
 glb = GLB_H_MAGIC
 glb += GLB_H_VERSION
 glb += [(GLB_H_SIZE * 3) + (GLB_H_SIZE * 2) + json.size + (GLB_H_SIZE * 2) + data.size].pack("L*")
