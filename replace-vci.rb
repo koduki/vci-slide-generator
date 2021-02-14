@@ -78,17 +78,16 @@ def padding_size(data_size)
     end
 end
 
-img_padding_size = padding_size(image.size)
-src_padding_size = padding_size(src.size)
 data = ""
 property["bufferViews"].each_with_index do |x, i|
     case i
     when img_idx
-        data += image + FF * img_padding_size
+        data += image + FF * padding_size(image.size)
     when src_idx
-        data += src + FF * src_padding_size
+        data += src + FF * padding_size(src.size)
     else
-        data += glb_buff_data[x["byteOffset"], x["byteLength"]]
+        len = x["byteLength"]
+        data += glb_buff_data[x["byteOffset"], len] + FF * padding_size(len)
     end
 end
 
@@ -113,9 +112,8 @@ property["bufferViews"][src_idx]["byteLength"] = src.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
-    offset = px["byteOffset"] + px["byteLength"]
-    offset += img_padding_size if i==(img_idx + 1)
-    offset += src_padding_size if i==(src_idx + 1)
+    len = px["byteLength"]
+    offset = px["byteOffset"] + len + padding_size(len)
     xs[i]["byteOffset"] = offset
 end
 
