@@ -36,8 +36,8 @@ property = JSON.parse(glb_json_data)
 #
 
 # load image
-img_idx = property["images"].find{|x| x["name"] == "template" }["bufferView"]
 image = open(image_path, 'rb').read
+img_idx = property["images"].find{|x| x["name"] == "template" }["bufferView"]
 
 # Lua Script
 src = <<"EOS"
@@ -63,14 +63,12 @@ function onUse(use)
     print("page: "..(index + 1))
 end
 EOS
-
 src_idx = property["extensions"]["VCAST_vci_embedded_script"]["scripts"][0]["source"]
-property["bufferViews"][src_idx]["byteLength"] = src.size
 
 #
 # Create Data
 #
-diff = (4 - (image.size % 3)) # zero padding
+diff = 4 - (image.size % 3) # zero padding
 data = ""
 property["bufferViews"].each_with_index do |x, i|
     case i
@@ -98,8 +96,9 @@ vci_meta["description"] = info[:description]
 material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
 material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
-# Update bufferViews
-property["bufferViews"][0]["byteLength"] = image.size
+# buffers/Update bufferViews
+property["bufferViews"][src_idx]["byteLength"] = src.size
+property["bufferViews"][img_idx]["byteLength"] = image.size
 xs = property["bufferViews"]
 (1..xs.size-1).each do |i|
     px = xs[i - 1]
@@ -107,6 +106,7 @@ xs = property["bufferViews"]
     offset += diff if i==(img_idx + 1)
     xs[i]["byteOffset"] = offset
 end
+
 property["buffers"][0]["byteLength"] = data.size
 json = property.to_json.gsub('/', '\/')
 
