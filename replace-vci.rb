@@ -127,21 +127,10 @@ json_padding = padding_size(json.size)
 json = json + (" " * json_padding)
 p "padding: #{json_padding}, json-size: #{json.size}"
 
-p "image-size: #{image.size}"
 p "data-size: #{data.size}"
 data_padding = padding_size(data.size)
 data = data + (FF * data_padding)
 p "padding: #{data_padding}, data-size: #{data.size}"
-
-
-# p "(json) % 2 == #{(data.size) % 2}"
-# p "(json) % 3 == #{(data.size) % 3}"
-# p "(json) % 4 == #{(data.size) % 4}"
-# p "(json + data) % 2 == #{(json.size + data.size) % 2}"
-# p "(json + data) % 3 == #{(json.size + data.size) % 3}"
-# p "(json + data) % 4 == #{(json.size + data.size) % 4}"
-
-
 
 #
 # Store as GLB
