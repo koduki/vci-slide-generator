@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/vci-slide-generator', '-f', 'dockerfiles/Dockerfile.app', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/vci-slide-generator']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['run', 'deploy', 'vci-slide-generator', 
+  '--image', 'gcr.io/$PROJECT_ID/vci-slide-generator', 
+  '--region', 'us-central1', 
+  '--platform', 'managed', 
+  '--allow-unauthenticated'
+  ]
+images:
+- gcr.io/$PROJECT_ID/vci-slide-generator
