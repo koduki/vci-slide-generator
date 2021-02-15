@@ -19,7 +19,7 @@ post '/generate' do
     end
 
     template_vci_path = "/app/template.vci"
-    output_vci_path = "/app/dist/output2.vci" 
+    output_vci_path = "/tmp/vci_slide/output2.vci" 
     image_path = "/tmp/vci_slide/slide.png"
     page_count = pdf2png(pdf_path, image_path)
 
