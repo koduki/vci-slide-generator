@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VCI Slide Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">
+                VCI Slide Generator デモ用
+            </h1>
+            <p class="subtitle">
+                Unity無しでのVCI生成の実験
+            </p>
+
+        </div>
+        <div class="container box">
+            <p>
+                <a href="https://office.live.com/start/powerpoint.aspx">PowerPoint</a>か<a
+                    href="https://www.google.com/intl/ja/slides/about/">Google Slide</a>を使ってスライドを作りPDFで保存してください。
+                保存したPDFを下記にアップロードすると変換されたVCIがダウンロードできるので<a href="https://seed.online/home">The Seed
+                    Online</a>にアップロードしてください。
+            </p>
+            <div class="content">
+                <strong>関連リンク</strong>
+                <ul>
+                    <li><a href="https://github.com/koduki/vci-slide-generator">ソースコード</a></li>
+                    <li><a href="https://zenn.dev/koduki/articles/d4332883491f7a">UnityなしでVCIの作成にチャレンジ! </a></li>
+                    <li><a href="https://zenn.dev/koduki/articles/7596fadeaff328">バーチャルキャストのVCIをRubyで解析してみた </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container box">
+            <form action="generate" method="POST" enctype="multipart/form-data">
+                <div class="field">
+                    <label class="label">アセット名</label>
+                    <div class="control">
+                        <input name="title" class="input" type="text" required placeholder="アセット名">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">作者</label>
+                    <div class="control">
+                        <input name="author" class="input" type="text" required placeholder="作者">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">バージョン</label>
+                    <div class="control">
+                        <input name="version" class="input" type="text" required value="1">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">アセット詳細</label>
+                    <div class="control">
+                        <input name="description" class="input" type="text" required placeholder="アセット詳細">
+                    </div>
+                </div>
+
+                <div class="field is-grouped file">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="file" accept=".pdf">
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">
+                                スライド(PDF)アップロード
+                            </span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link">生成</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</body>
+
+</html>
