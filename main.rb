@@ -1,5 +1,10 @@
 require 'sinatra'
 require './lib/vci_slide.rb'
+
+get '/' do
+    erb :index
+end
+
 get '/' do
     erb :index
 end
