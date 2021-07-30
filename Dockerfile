@@ -16,7 +16,7 @@ RUN apt-get update && \
 
 RUN gem install sinatra
 
-RUN mkdir /app
+RUN mkdir -p /app
 WORKDIR /app
 
 ADD lib/ /app/lib
