@@ -18,7 +18,7 @@ post '/generate' do
         f.write(file.read)
     end
 
-    template_vci_path = "/app/template.vci"
+    template_vci_path = "/app/resources/template.vci"
     output_vci_path = "/tmp/vci_slide/output2.vci" 
     image_path = "/tmp/vci_slide/slide.png"
     page_count = pdf2png(pdf_path, image_path)
