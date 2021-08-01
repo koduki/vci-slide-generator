@@ -20,7 +20,7 @@ post '/generate' do
 
     template_vci_path = "/app/resources/template.vci"
     vci_script_path = "/app/resources/vci-main.lua.erb"
-    output_vci_path = "/tmp/vci_slide/output2.vci" 
+    output_vci_path = "/tmp/vci_slide/output.vci" 
     image_path = "/tmp/vci_slide/slide.png"
     page_count = pdf2png(pdf_path, image_path)
 

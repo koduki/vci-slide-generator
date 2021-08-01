@@ -7,6 +7,9 @@ GLB_JSON_TYPE = "JSON".b
 GLB_BUFF_TYPE = "BIN\x00".b
 FF = "\x00".b
 
+SLIDE_MATERIAL_NAME="Slide"
+SLIDE_TEXTURE_NAME = "Slide-all"
+
 class VCISlide
     attr_accessor :template_vci_path, :vci_script_path, :image_path, :page_size, :output_path, :meta_title, :meta_version, :meta_author, :meta_description
 
@@ -97,7 +100,7 @@ class VCISlide
     # load image
     def load_image property, image_path
         image = open(image_path, 'rb').read
-        img_idx = property["images"].find{|x| x["name"] == "template" }["bufferView"]
+        img_idx = property["images"].find{|x| x["name"] == SLIDE_TEXTURE_NAME }["bufferView"]
         [image, img_idx]
     end
 
@@ -139,7 +142,7 @@ class VCISlide
         vci_meta["description"] = meta[:description]
 
         # Adjust for page size
-        material = property["materials"].find{|x| x["name"] == "ScreenTexture"}
+        material = property["materials"].find{|x| x["name"] == SLIDE_MATERIAL_NAME}
         material["pbrMetallicRoughness"]["baseColorTexture"]["extensions"]["KHR_texture_transform"]["scale"] = [(1.0 / page_size).floor(5), 1]
 
         # buffers/Update bufferViews
