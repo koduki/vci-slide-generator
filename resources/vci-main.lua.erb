@@ -1,24 +1,41 @@
-print("slideboard: ver02")
+print("slideboard: ver01")
 
 local MAX_SLIDE_PAGE = <%= page_size.to_i %>
+local MAX_SLIDE_X_INDEX = <%= max_page_index[:x] %> 
+local MAX_SLIDE_Y_INDEX = <%= max_page_index[:y] %> 
+
 local UseCount = 0
 local DummyRightScreen = vci.assets.GetSubItem("DummyRightScreen")
-local DummyLeftScreen = vci.assets.GetSubItem("DummyLeftScreen")
-local RightScreen = vci.assets.GetSubItem("RightScreen")
-local LeftScreen = vci.assets.GetSubItem("LeftScreen")
+local DummyLeftScreen  = vci.assets.GetSubItem("DummyLeftScreen")
+local RightScreen      = vci.assets.GetSubItem("RightScreen")
+local LeftScreen       = vci.assets.GetSubItem("LeftScreen")
 
 function NextSlide(boardStatus)
     if boardStatus == "right" then
         UseCount = UseCount + 1
+        if (UseCount > (MAX_SLIDE_PAGE - 1)) then
+            UseCount = 0
+        end
+        print("next")
     elseif boardStatus == "left" then
         UseCount = UseCount - 1
+        if (UseCount < 0) then
+            UseCount = (MAX_SLIDE_PAGE - 1)
+        end
+        print("prev")
     end
 
-    local index = UseCount % MAX_SLIDE_PAGE
+    local xidx = UseCount % MAX_SLIDE_X_INDEX
+    local yidx = math.ceil((UseCount + 1 ) / MAX_SLIDE_X_INDEX) % MAX_SLIDE_Y_INDEX
+    local width = (1.0 / MAX_SLIDE_X_INDEX)
+    local height = (1.0 / MAX_SLIDE_Y_INDEX)
     local offset = Vector2.zero
-    offset.y = 0
-    offset.x = (1.0 / MAX_SLIDE_PAGE) * index
-    print(string.format("page: %d, onUse: %d, offset.x: %d, offset.y: %d", index + 1, UseCount, offset.x, offset.y))
+    offset.y = 1 - height * yidx
+    offset.x = width * xidx
+
+    local page = UseCount % (MAX_SLIDE_X_INDEX * MAX_SLIDE_Y_INDEX) + 1
+    print(string.format("onUse: %d, index-x: %d, index-y: %d, page: %d, offset.x: %f, offset.y: %f", UseCount, xidx, yidx, page, offset.x, offset.y))
+
     vci.assets._ALL_SetMaterialTextureOffsetFromName("Slide", offset)
 end
 

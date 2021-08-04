@@ -10,3 +10,11 @@ VCI書き換え実験用スクリプト。詳しくは下記を参照。
 ```bash
 docker run -it -v $(pwd):/app -p 5000:5000 koduki/vci-slide-generator
 ```
+
+## CLI
+
+```
+$ ruby ./cli.rb export json gen.vci
+$ ruby ./cli.rb export image gen.vci "Slide-all" gen.vci.png
+$ ruby ./cli.rb export image unity.vci "21" unity.vci.png
+```
