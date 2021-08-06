@@ -1,20 +1,14 @@
-FROM debian
+FROM ruby
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        libreoffice \
-        fonts-noto-cjk-extra fonts-liberation2 \
         imagemagick \
         poppler-utils \
-        xpdf \
-        curl \
-        ca-certificates \
-        ruby-full \
         && \ 
     apt-get -y --purge autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-RUN gem install sinatra
+RUN gem install sinatra puma
 
 RUN mkdir -p /app
 WORKDIR /app
