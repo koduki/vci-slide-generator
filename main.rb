@@ -54,7 +54,7 @@ def pdf2png pdf_path, image_path
     page_size = stdout.to_i
 
     max_page_index = {x:MAX_PAGE_X_INDEX, y:(page_size / (MAX_PAGE_X_INDEX * 1.0)).ceil}
-    stdout, stderr, status = Open3.capture3("montage -tile #{max_page_index[:x]}x#{max_page_index[:y]} -geometry 100%+0+0 `ls -1 /tmp/vci_slide/image-*.png` #{image_path}")
+    stdout, stderr, status = Open3.capture3("montage -tile #{max_page_index[:x]}x#{max_page_index[:y]} -geometry 100% `ls -1 /tmp/vci_slide/image-*.png` #{image_path}")
     
     # debug
     p stdout
