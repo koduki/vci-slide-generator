@@ -7,6 +7,11 @@ VCI書き換え実験用スクリプト。詳しくは下記を参照。
 - [バーチャルキャストのVCIをRubyで解析してみた](https://zenn.dev/koduki/articles/7596fadeaff328)
 - [UnityなしでVCIの作成にチャレンジ!](https://zenn.dev/koduki/articles/d4332883491f7a)
 
+## Templateのソースコード
+
+元になるVCIのソースコードは下記にあります。
+https://github.com/koduki/vci-slideboard
+
 ## Run
 ```bash
 docker run -it -v $(pwd):/app -p 5000:5000 koduki/vci-slide-generator
