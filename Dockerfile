@@ -16,7 +16,8 @@ WORKDIR /app
 ADD lib/ /app/lib
 ADD views /app/views
 ADD main.rb /app/main.rb
-ADD resources/template.vci /app/resources/template.vci
+ADD resources/template.vci /app/resources/
+ADD resources/vci-main.lua.erb /app/resources/
 ADD resources/policy.xml /etc/ImageMagick-6/policy.xml
 
 ENV PORT=5000
