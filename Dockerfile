@@ -11,7 +11,6 @@ RUN apt-get update && \
 RUN gem install sinatra puma
 
 RUN mkdir -p /app
-RUN mkdir -p /tmp/vci_slide/
 
 WORKDIR /app
 

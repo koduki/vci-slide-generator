@@ -16,7 +16,7 @@ post '/generate' do
     description = params[:description]
     filename = params[:file][:filename]
     file = params[:file][:tempfile]
-    pdf_path = "/tmp/vci_slide/#{filename}"
+    pdf_path = "/tmp/vci_slide/slide.pdf"
     File.open(pdf_path, 'wb') do |f|
         f.write(file.read)
     end
