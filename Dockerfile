@@ -11,6 +11,8 @@ RUN apt-get update && \
 RUN gem install sinatra puma
 
 RUN mkdir -p /app
+RUN mkdir -p /tmp/vci_slide/
+
 WORKDIR /app
 
 ADD lib/ /app/lib
@@ -19,6 +21,5 @@ ADD main.rb /app/main.rb
 ADD resources/template.vci /app/resources/
 ADD resources/vci-main.lua.erb /app/resources/
 ADD resources/policy.xml /etc/ImageMagick-6/policy.xml
-
 ENV PORT=5000
 CMD ruby main.rb -p $PORT -o '0.0.0.0'
