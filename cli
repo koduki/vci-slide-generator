@@ -18,6 +18,7 @@ COMMANDS
     + export
         - json: export meta data from VCI. e.g) ./cli export json test001.vci
         - image: export slide image from VCI. e.g) ./cli export image test001.vci "Slide-all" test001.png
+        - thumbnail: export thumbnail image from VCI. e.g) ./cli export thumbnail test001.vci thumbnail.png
     + generate
         - pdf: generate generate sample PDF for test e.g) ./cli generate pdf testslide 25
 EOS
@@ -27,7 +28,7 @@ end
 case 
 when cmd == "export" then
     template_vci_path = ARGV[2]
-    vci_slide = VCISlide.new template_vci_path, nil, nil, nil, nil
+    vci_slide = VCISlide.new template_vci_path, nil, nil, nil, nil, nil
     property, glb_buff_data = vci_slide.load_template(template_vci_path)
 
     case subcmd
@@ -44,6 +45,19 @@ when cmd == "export" then
         
         bfv = property["bufferViews"][img_idx]
         img_data = glb_buff_data[bfv["byteOffset"], bfv["byteLength"]];1
+        open(img_output_path, 'wb') do |f|
+            f.write(img_data.unpack('C*').pack('C*'))
+        end
+    when "thumbnail" then
+        img_output_path = ARGV[3]
+
+        vci_meta = property["extensions"]["VCAST_vci_meta"]
+        thum_idx = vci_meta["thumbnail"]
+        img_idx = property["images"][thum_idx]["bufferView"]
+        img_len = property["bufferViews"][img_idx]["byteLength"]
+        
+        bfv = property["bufferViews"][img_idx]
+        img_data = glb_buff_data[bfv["byteOffset"], bfv["byteLength"]]
         open(img_output_path, 'wb') do |f|
             f.write(img_data.unpack('C*').pack('C*'))
         end
