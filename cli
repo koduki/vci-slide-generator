@@ -28,7 +28,7 @@ end
 case 
 when cmd == "export" then
     template_vci_path = ARGV[2]
-    vci_slide = VCISlide.new template_vci_path, nil, nil, nil, nil, nil
+    vci_slide = VCISlide.new
     property, glb_buff_data = vci_slide.load_template(template_vci_path)
 
     case subcmd

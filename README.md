@@ -17,6 +17,11 @@ https://github.com/koduki/vci-slideboard
 docker run -it -v $(pwd):/app -p 5000:5000 koduki/vci-slide-generator
 ```
 
+## Test by curl
+```bash
+curl -v -X POST http://localhost:5000/generate -o hoge.vci -F title=hoge -F author=koduki -F version=1 -F description=foobar -F file=@slide.pdf
+```
+
 ## CLI for debug
 
 ```
@@ -30,6 +35,8 @@ COMMANDS
     + export
         - json: export meta data from VCI. e.g) ./cli export json test001.vci
         - image: export slide image from VCI. e.g) ./cli export image test001.vci "Slide-all" test001.png
+        - thumbnail: export thumbnail image from VCI. e.g) ./cli export thumbnail test001.vci thumbnail.png
+ 
     + generate
         - pdf: generate generate sample PDF for test e.g) ./cli generate pdf testslide 25
 ```

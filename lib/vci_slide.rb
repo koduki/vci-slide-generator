@@ -13,10 +13,11 @@ SLIDE_TEXTURE_NAME = "Slide-all"
 class VCISlide
     attr_accessor :template_vci_path, :vci_script_path, :image_path, :page_size, :output_path, :meta_title, :meta_version, :meta_author, :meta_description, :max_page_index, :max_page_index
 
-    def initialize template_vci_path, vci_script_path, image_path, page_size, max_page_index, output_path
+    def initialize template_vci_path=nil, vci_script_path=nil, image_path=nil, thum_path=nil, page_size=nil, max_page_index=nil, output_path=nil
         @template_vci_path = template_vci_path
         @vci_script_path = vci_script_path
         @image_path = image_path
+        @thum_path = thum_path
         @page_size = page_size
         @output_path = output_path
         @meta_title = "untitled"
@@ -29,11 +30,12 @@ class VCISlide
     def generate
         property, glb_buff_data = load_template(@template_vci_path)
         image, img_idx = load_image(property, @image_path, SLIDE_TEXTURE_NAME)
+        thumbnail, thum_idx = load_thumbnail(property, @thum_path)
         src, src_idx = load_script(property, page_size, max_page_index)
 
-        data = mk_data(property, glb_buff_data, image, img_idx, src, src_idx)
+        data = mk_data(property, glb_buff_data, image, img_idx, thumbnail, thum_idx, src, src_idx)
         meta = {title:@meta_title, version:@meta_version, author:@meta_author, description:@meta_description}
-        json = mk_json(property, image, img_idx, src, src_idx, data, @page_size, meta)
+        json = mk_json(property, image, img_idx, thumbnail, thum_idx, src, src_idx, data, @page_size, meta)
 
         json, data = align(json,  data)
         store(@output_path, json, data)
@@ -82,7 +84,11 @@ class VCISlide
     # Load Template
     #
     def load_template template_vci_path
-        io = open(template_vci_path)
+        load_template_from_data open(template_vci_path)
+    end
+
+    def load_template_from_data file
+        io = file
         glb_h_magic = io.read(GLB_H_SIZE)
         glb_h_version = io.read(GLB_H_SIZE).unpack("L*")[0]
         glb_h_length = io.read(GLB_H_SIZE).unpack("L*")[0]
@@ -109,6 +115,19 @@ class VCISlide
         property["images"].find{|x| x["name"] == slide_texture_name }["bufferView"]
     end
 
+    # Load Thumbnail
+    def load_thumbnail property, thum_path
+        p "hnakada"
+        p thum_path
+        thum = open(thum_path, 'rb').read
+        p "hnakada2"
+        vci_meta = property["extensions"]["VCAST_vci_meta"]
+        idx = vci_meta["thumbnail"]
+        thum_idx = property["images"][idx]["bufferView"]
+
+        [thum, thum_idx]
+    end
+
     # Lua Script
     def load_script property, page_size, max_page_index
         require 'erb'
@@ -119,12 +138,14 @@ class VCISlide
         return [src, src_idx]
     end
 
-    def mk_data property, glb_buff_data, image, img_idx, src, src_idx
+    def mk_data property, glb_buff_data, image, img_idx, thumbnail, thum_idx, src, src_idx
         data = ""
         property["bufferViews"].each_with_index do |x, i|
             case i
             when img_idx
                 data += image + FF * padding_size(image.size)
+            when thum_idx
+                data += thumbnail + FF * padding_size(thumbnail.size)
             when src_idx
                 data += src + FF * padding_size(src.size)
             else
@@ -138,7 +159,9 @@ class VCISlide
     #
     # Create JSON
     #
-    def mk_json property, image, img_idx, src, src_idx, data, page_size, meta
+    def mk_json property, image, img_idx, thumbnail, thum_idx, src, src_idx, data, page_size, meta
+        p thum_idx
+        p thumbnail.size
         # Update meta data
         vci_meta = property["extensions"]["VCAST_vci_meta"]
         vci_meta["title"] = meta[:title]
@@ -153,6 +176,7 @@ class VCISlide
 
         # buffers/Update bufferViews
         property["bufferViews"][img_idx]["byteLength"] = image.size
+        property["bufferViews"][thum_idx]["byteLength"] = thumbnail.size
         property["bufferViews"][src_idx]["byteLength"] = src.size
         xs = property["bufferViews"]
         (1..xs.size-1).each do |i|
