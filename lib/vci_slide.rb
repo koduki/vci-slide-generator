@@ -117,10 +117,7 @@ class VCISlide
 
     # Load Thumbnail
     def load_thumbnail property, thum_path
-        p "hnakada"
-        p thum_path
         thum = open(thum_path, 'rb').read
-        p "hnakada2"
         vci_meta = property["extensions"]["VCAST_vci_meta"]
         idx = vci_meta["thumbnail"]
         thum_idx = property["images"][idx]["bufferView"]

@@ -47,6 +47,13 @@ def init
 end
 
 def pdf2png pdf_path, image_path, thum_path
+    r = export_slide pdf_path, image_path
+    export_thumbnail thum_path
+
+    r
+end
+
+def export_slide  pdf_path, image_path
     require 'open3'
 
     #
@@ -66,12 +73,12 @@ def pdf2png pdf_path, image_path, thum_path
     p stderr
     p status
 
-    #
-    # make thumbnail
-    #
+    [page_size, max_page_index]
+end
+
+def export_thumbnail thum_path
     stdout, stderr, status = Open3.capture3("ls -1 /tmp/vci_slide/image-*.png|sort|head -1")
     thum_src_path = stdout.to_s.strip
-    p thum_src_path
     require 'rmagick'
 
     height = 512
@@ -82,6 +89,4 @@ def pdf2png pdf_path, image_path, thum_path
 
     thum = image.crop(Magick::CenterGravity, narrow, narrow).resize(width, height)
     thum.write(thum_path)
-
-    [page_size, max_page_index]
 end
