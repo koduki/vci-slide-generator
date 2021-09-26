@@ -13,18 +13,18 @@ SLIDE_TEXTURE_NAME = "Slide-all"
 class VCISlide
     attr_accessor :template_vci_path, :vci_script_path, :image_path, :page_size, :output_path, :meta_title, :meta_version, :meta_author, :meta_description, :max_page_index, :max_page_index
 
-    def initialize template_vci_path=nil, vci_script_path=nil, work_dir=nil, image_name=nil, thum_name=nil, page_size=nil, max_page_index=nil, output_name=nil
-        @template_vci_path = template_vci_path
-        @vci_script_path = vci_script_path
-        @image_path = "#{work_dir}/#{image_name}"
-        @thum_path = "#{work_dir}/#{thum_name}"
+    def initialize template=nil, workspace=nil, vci_meta=nil, page_size=nil, max_page_index=nil
+        @template_vci_path = template.vci_path unless template == nil
+        @vci_script_path = template.vci_script_path unless template == nil
+        @image_path = workspace.image_path unless workspace == nil
+        @thum_path = workspace.thum_path unless workspace == nil
+        @output_path = workspace.vci_output_path unless workspace == nil
         @page_size = page_size
-        @output_path = "#{work_dir}/#{output_name}"
-        @meta_title = "untitled"
-        @meta_version = 1.0
-        @meta_author = "unknown"
-        @meta_description = "none"
         @max_page_index = max_page_index 
+        @meta_title = vci_meta.title unless vci_meta == nil
+        @meta_version = vci_meta.version unless vci_meta == nil
+        @meta_author = vci_meta.author unless vci_meta == nil
+        @meta_description = vci_meta.description unless vci_meta == nil
     end
 
     def generate
@@ -186,5 +186,55 @@ class VCISlide
         property["buffers"][0]["byteLength"] = data.size
         json = property.to_json.gsub('/', '\/')
         json.force_encoding("ASCII-8BIT")
+    end
+end
+
+class Pdf2png
+    def initialize
+    end
+
+    def transform template, workspace
+        r = export_slide template, workspace
+        export_thumbnail workspace
+
+        r
+    end
+
+    def export_slide template, workspace
+        require 'open3'
+
+        #
+        # make slide image
+        #
+        Open3.capture3("pdftoppm #{workspace.pdf_path} #{workspace.dir}/image")
+        Open3.capture3("mogrify -format png -resize 800x450 #{workspace.dir}/image*")
+        stdout, stderr, status = Open3.capture3("ls -1 #{workspace.dir}/image-*.png|wc -l")
+        page_size = stdout.to_i
+
+        max_page_index = {x:template.max_page_x_index, y:(page_size / (template.max_page_x_index * 1.0)).ceil}
+        stdout, stderr, status = Open3.capture3("montage -tile #{max_page_index[:x]}x#{max_page_index[:y]} -geometry 100% `ls -1 #{workspace.dir}/image-*.png` #{workspace.image_path}")
+
+        stdout, stderr, status = Open3.capture3("ls -1 #{workspace.dir}/image-*.png|wc -l")
+        # debug
+        p stdout
+        p stderr
+        p status
+
+        [page_size, max_page_index]
+    end
+
+    def export_thumbnail workspace
+        stdout, stderr, status = Open3.capture3("ls -1 #{workspace.dir}/image-*.png|sort|head -1")
+        thum_src_path = stdout.to_s.strip
+        require 'rmagick'
+
+        height = 512
+        width = 512
+
+        image = Magick::Image.from_blob(open(thum_src_path).read).first
+        narrow = image.columns > image.rows ? image.rows : image.columns
+
+        thum = image.crop(Magick::CenterGravity, narrow, narrow).resize(width, height)
+        thum.write(workspace.thum_path)
     end
 end
