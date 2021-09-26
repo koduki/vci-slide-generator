@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get -y --purge autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-RUN gem install sinatra puma rmagick
+RUN gem install sinatra puma rmagick rest-client
 
 RUN mkdir -p /app
 

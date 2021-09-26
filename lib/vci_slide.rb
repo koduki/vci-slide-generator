@@ -13,13 +13,13 @@ SLIDE_TEXTURE_NAME = "Slide-all"
 class VCISlide
     attr_accessor :template_vci_path, :vci_script_path, :image_path, :page_size, :output_path, :meta_title, :meta_version, :meta_author, :meta_description, :max_page_index, :max_page_index
 
-    def initialize template_vci_path=nil, vci_script_path=nil, image_path=nil, thum_path=nil, page_size=nil, max_page_index=nil, output_path=nil
+    def initialize template_vci_path=nil, vci_script_path=nil, work_dir=nil, image_name=nil, thum_name=nil, page_size=nil, max_page_index=nil, output_name=nil
         @template_vci_path = template_vci_path
         @vci_script_path = vci_script_path
-        @image_path = image_path
-        @thum_path = thum_path
+        @image_path = "#{work_dir}/#{image_name}"
+        @thum_path = "#{work_dir}/#{thum_name}"
         @page_size = page_size
-        @output_path = output_path
+        @output_path = "#{work_dir}/#{output_name}"
         @meta_title = "untitled"
         @meta_version = 1.0
         @meta_author = "unknown"
