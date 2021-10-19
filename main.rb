@@ -6,6 +6,7 @@ require './lib/vci_slide.rb'
 require './lib/tso.rb'
 
 get '/' do
+    @is_debug = params[:debug] === "true"
     erb :index
 end
 
@@ -34,13 +35,16 @@ post '/generate' do
     vci_slide = VCISlide.new template, workspace, vci_meta, page_size, max_page_index
     vci_slide.generate
 
-    # transfer to TSO
-    vci = open(workspace.vci_output_path)
-    tso = Tso.new(token)
-    r = tso.upload_vci(vci).to_json
+    if token.empty?
+        send_file workspace.vci_output_path, {filename:"slide.vci", disposition:"attachment"}
+    else
+        # transfer to TSO
+        vci = open(workspace.vci_output_path)
+        tso = Tso.new(token)
+        r = tso.upload_vci(vci).to_json
 
-    erb :index
-    # send_file workspace.vci_output_path, {filename:"slide.vci", disposition:"attachment"}
+        erb :index
+    end
 end
 
 def upload upload_path, file

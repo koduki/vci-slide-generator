@@ -1,108 +1,129 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VCI Slide Generator</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>VCI Slide Generator</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    </head>
 
-<body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">
-                VCI Slide Generator デモ用
-            </h1>
-            <p class="subtitle">
-                Unity無しでのVCI生成の実験
-            </p>
-        </div>
-        <div class="container box">
-            <p>
-                <a href="https://office.live.com/start/powerpoint.aspx">PowerPoint</a>か<a
-                    href="https://www.google.com/intl/ja/slides/about/">Google Slide</a>を使ってスライドを作りPDFで保存してください。
-                保存したPDFを下記にアップロードすると変換されたVCIがダウンロードできるので<a href="https://seed.online/home">The Seed
-                    Online</a>にアップロードしてください。スライドは16:9のサイズに最適化しています。スライド枚数は今のところ100枚程度まで対応しています。
-            </p>
-            <div class="content">
-                <strong>レーザーポインタ ＆ サンプルスライドVCI:</strong>
+    <body>
+        <section class="section">
+            <div class="container">
+                <h1 class="title">
+                    VCI Slide Generator デモ用
+                </h1>
+                <p class="subtitle">
+                    Unity無しでのVCI生成の実験
+                </p>
+            </div>
+            <div class="container box">
+                <p>
+                    <a href="https://office.live.com/start/powerpoint.aspx">PowerPoint</a>か<a
+                        href="https://www.google.com/intl/ja/slides/about/">Google Slide</a>を使ってスライドを作りPDFで保存してください。
+                    保存したPDFを下記にアップロードすると変換されたVCIがダウンロードできるので<a href="https://seed.online/home">The Seed
+                        Online</a>にアップロードしてください。スライドは16:9のサイズに最適化しています。スライド枚数は今のところ100枚程度まで対応しています。
+                </p>
+                <div class="content">
+                    <strong>レーザーポインタ ＆ サンプルスライドVCI:</strong>
+                    <ul>
+                        <li><a href="https://seed.online/products/78b64e8f9bbeb6700be86c47ee2cd3b1c805b377ff3264e6741b289ee41fd7e9">プレゼン用VCIスライド β版</a></li>
+                        <li><a href="https://seed.online/products/bcaf01edf83f0526682593cd160d5f36816c13c0faca41fc7fdfa1c421e0167d">VCIスライド用レーザポインタ</a></li>
+                    </ul>
+                    <strong>関連リンク:</strong>
+                    <ul>
+                        <li><a href="https://github.com/koduki/vci-slide-generator">ソースコード</a></li>
+                        <li><a href="https://zenn.dev/koduki/articles/d4332883491f7a">UnityなしでVCIの作成にチャレンジ! </a></li>
+                        <li><a href="https://zenn.dev/koduki/articles/7596fadeaff328">バーチャルキャストのVCIをRubyで解析してみた </a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container box">
+                <h2 class="title">
+                    What's New & Updated
+                </h2>
                 <ul>
-                    <li><a href="https://seed.online/products/78b64e8f9bbeb6700be86c47ee2cd3b1c805b377ff3264e6741b289ee41fd7e9">プレゼン用VCIスライド β版</a></li>
-                    <li><a href="https://seed.online/products/bcaf01edf83f0526682593cd160d5f36816c13c0faca41fc7fdfa1c421e0167d">VCIスライド用レーザポインタ</a></li>
-                </ul>
-                <strong>関連リンク:</strong>
-                <ul>
-                    <li><a href="https://github.com/koduki/vci-slide-generator">ソースコード</a></li>
-                    <li><a href="https://zenn.dev/koduki/articles/d4332883491f7a">UnityなしでVCIの作成にチャレンジ! </a></li>
-                    <li><a href="https://zenn.dev/koduki/articles/7596fadeaff328">バーチャルキャストのVCIをRubyで解析してみた </a></li>
+                    <li>2021-08-05: v0.2 - スライド枚数上限を100以上に改善。レーザポインタ対応。 </li>
+                    <li>2021-02-16: v0.1 - 初回リリース </li>
                 </ul>
             </div>
-        </div>
-        <div class="container box">
-            <h2 class="title">
-                What's New & Updated
-            </h2>
-            <ul>
-                <li>2021-08-05: v0.2 - スライド枚数上限を100以上に改善。レーザポインタ対応。 </li>
-                <li>2021-02-16: v0.1 - 初回リリース </li>
-            </ul>
-        </div>
-        <div class="container box">
-            <form action="generate" method="POST" enctype="multipart/form-data">
-                <div class="field">
-                    <label class="label">TSO Token</label>
-                    <div class="control">
-                        <input name="token" class="input" type="text" required placeholder="Bearer abCdefg...">
-                    </di>
-                </div>
-                <div class="field">
-                    <label class="label">アセット名</label>
-                    <div class="control">
-                        <input name="title" class="input" type="text" required placeholder="アセット名">
+            <div class="container box">
+                <form action="generate" method="POST" enctype="multipart/form-data">
+                    <% if @is_debug %>
+                    <div class="field">
+                        <label class="label">TSO Token</label>
+                        <div class="control">
+                            <input id="token" name="token" class="input" type="text" required placeholder="Bearer abCdefg...">
+                        </di>
                     </div>
-                </div>
-                <div class="field">
-                    <label class="label">作者</label>
-                    <div class="control">
-                        <input name="author" class="input" type="text" required placeholder="作者">
+                    <% else %>
+                    <input type="hidden" name="token" value="" />
+                    <% end %>
+                    <div class="field">
+                        <label class="label">アセット名</label>
+                        <div class="control">
+                            <input name="title" class="input" type="text" required placeholder="アセット名">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <label class="label">バージョン</label>
-                    <div class="control">
-                        <input name="version" class="input" type="text" required value="1">
+                    <div class="field">
+                        <label class="label">作者</label>
+                        <div class="control">
+                            <input name="author" class="input" type="text" required placeholder="作者">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <label class="label">アセット詳細</label>
-                    <div class="control">
-                        <input name="description" class="input" type="text" required placeholder="アセット詳細">
+                    <div class="field">
+                        <label class="label">バージョン</label>
+                        <div class="control">
+                            <input name="version" class="input" type="text" required value="1">
+                        </div>
                     </div>
-                </div>
+                    <div class="field">
+                        <label class="label">アセット詳細</label>
+                        <div class="control">
+                            <input name="description" class="input" type="text" required placeholder="アセット詳細">
+                        </div>
+                    </div>
 
-                <div class="field is-grouped file">
-                    <label class="file-label">
-                        <input class="file-input" type="file" name="file" accept=".pdf">
-                        <span class="file-cta">
-                            <span class="file-icon">
-                                <i class="fas fa-upload"></i>
+                    <div class="field is-grouped file">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="file" accept=".pdf">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">
+                                    スライド(PDF)アップロード
+                                </span>
                             </span>
-                            <span class="file-label">
-                                スライド(PDF)アップロード
-                            </span>
-                        </span>
-                    </label>
-                </div>
-
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button class="button is-link">生成</button>
+                        </label>
                     </div>
-                </div>
-            </form>
-        </div>
-    </section>
-</body>
+
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-link"><%= if @is_debug then; "TSOにVCIを連携" else "VCIのダウンロード" end %></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </body>
+    <script lang="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            let token = document.getElementById("token")
+            if(token){
+                let ttoken = localStorage.getItem('tso-token')
+                if(ttoken){
+                    token.value = ttoken
+                }
+                token.addEventListener('focusout', (event) => {
+                    if (token.value){
+                        localStorage.setItem('tso-token', token.value)
+                        console.log("Update TSO token")
+                    }
+                });
+            }
+        });
+    </script>
 
 </html>
