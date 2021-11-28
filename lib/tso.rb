@@ -10,7 +10,7 @@ class Tso
 
   def call_api(path, data, url=@url)
     begin
-      ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
+      ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VCI Slide Generator"
       headers = { 
           'Accept' => 'application/json',
           'Authorization'=> @token,
@@ -74,7 +74,6 @@ class Tso
     # upload vci
     vci_data = file.read  # load for icon
     file.pos = 0          # reset file position
-    # file_data = open('/home/koduki/pictures/20210912.png').read
     response = call_api("/files/user/post-items", {
       :itemType => 'prop',
       :file => file

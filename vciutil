@@ -12,15 +12,15 @@ DESCRIPTION
      - VCI generator utilities for debug
 
 SYNOPSIS
-    cli COMMAND SUBCOMMAND
+    vciutil COMMAND SUBCOMMAND
 
 COMMANDS
     + export
-        - json: export meta data from VCI. e.g) ./cli export json test001.vci
-        - image: export slide image from VCI. e.g) ./cli export image test001.vci "Slide-all" test001.png
-        - thumbnail: export thumbnail image from VCI. e.g) ./cli export thumbnail test001.vci thumbnail.png
+        - json: export meta data from VCI. e.g) ./vciutil export json test001.vci
+        - image: export slide image from VCI. e.g) ./vciutil export image test001.vci "Slide-all" test001.png
+        - thumbnail: export thumbnail image from VCI. e.g) ./vciutil export thumbnail test001.vci thumbnail.png
     + generate
-        - pdf: generate generate sample PDF for test e.g) ./cli generate pdf testslide 25
+        - pdf: generate generate sample PDF for test e.g) ./vciutil generate pdf testslide 25
 EOS
 
 end
